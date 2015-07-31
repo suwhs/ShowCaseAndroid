@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="whsHelpOverlay__">
+       <attr name="__overlayScreens" format="string|reference"/>
+
+    </declare-styleable>
+    <string name="overlaysManagerTag" />
+
+    <dimen name="helpOverlayButtonMarginBottom">16dp</dimen>
+    <dimen name="helpOverlayTextBig">20sp</dimen>
+
+    <string name="overlaysmanagertag">su.whs.ui.helpoverlay.OverlaysManager</string>
+    <string name="whs_s_next">Next</string>
+    <string name="whs_s_back">Back</string>
+    <string name="whs_s_last">Done</string>
+
+    <declare-styleable name="whsHelpOverlay">
+        <attr name="overlayScreens" format="reference" />
+        <attr name="autoStart" format="enum" default="0">
+            <enum name="none" value="0"/>
+            <enum name="once" value="1"/>
+            <enum name="version" value="2"/>
+        </attr>
+
+        <attr name="highlightRectCornerRadius" format="dimension"/> <!-- TODO: implement  usage-->
+        <attr name="highlightRectEdgesBlur" format="dimension"/> <!-- TODO: implement usage -->
+        <attr name="borderWidth" format="dimension"/> <!-- undocumented -->
+        <attr name="startOnClick" format="reference"></attr>
+        <attr name="touchToNext" format="boolean"/>
+        <attr name="enableCloseButton" format="boolean" />
+        <attr name="enableBackButton" format="boolean" />
+        <attr name="nextButtonText" format="reference|string" />
+        <attr name="lastButtonText" format="reference|string" />
+        <attr name="backButtonText" format="reference|string" />
+        <attr name="closeButtonText" format="reference|string" />
+        <attr name="closeButtonBackground" format="reference" />
+        <attr name="buttonsBackground" format="reference" />
+        <attr name="buttonsFontName" format="string"/> <!-- TODO: implement usage -->
+        <attr name="buttonsFontColor" format="color|reference"/> <!-- TODO: implement usage -->
+        <attr name="buttonsFontSize" format="dimension"/> <!-- TODO: implement usage -->
+        <!-- style -->
+        <attr name="backgroundColor" format="color|reference" />
+        <attr name="backgroundAlpha" format="float" />
+        <attr name="hintFontColor" format="color|reference" />
+        <attr name="hintTextSize" format="dimension" />
+        <attr name="hintFontName" format="string" />
+        <attr name="highlights">
+            <enum name="rect" value="0" />
+            <enum name="auto" value="1" />
+        </attr>
+        <attr name="noarrow" default="false" format="boolean" />
+        <attr name="arrow" format="reference" />
+        <!-- deprecated
+        <attr name="arrowToLeftTop" format="reference" />
+        <attr name="arrowToRightTop" format="reference" />
+        <attr name="arrowToLeftBottom" format="reference" />
+        <attr name="arrowToRightBottom" format="reference" />
+        -->
+        <attr name="arrowMargins" format="dimension" />
+        <attr name="arrowMarginLeft" format="dimension" />
+        <attr name="arrowMarginTop" format="dimension" />
+        <attr name="arrowMarginRight" format="dimension" />
+        <attr name="arrowMarginBottom" format="dimension" />
+        <attr name="hintMargins" format="dimension" />
+        <attr name="hintMarginLeft" format="dimension" />
+        <attr name="hintMarginTop" format="dimension" />
+        <attr name="hintMarginRight" format="dimension" />
+        <attr name="hintMarginBottom" format="dimension" />
+        <attr name="markerDrawable" format="reference" />
+        <attr name="markerMask" format="reference" />
+        <attr name="markerMargins" format="dimension" />
+        <attr name="markerMarginLeft" format="dimension" />
+        <attr name="markerMarginTop" format="dimension" />
+        <attr name="markerMarginRight" format="dimension" />
+        <attr name="markerMarginBottom" format="dimension" />
+    </declare-styleable>
+</resources>

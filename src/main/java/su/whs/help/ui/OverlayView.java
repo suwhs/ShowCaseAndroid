@@ -1,4 +1,4 @@
-package su.whs.hole.ui;
+package su.whs.help.ui;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -13,8 +13,6 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -25,21 +23,20 @@ import android.view.ViewParent;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ScrollView;
+import android.widget.TextView;
 
-import su.whs.hole.utils.OverlaysManager;
-import su.whs.watl.samples.R;
-import su.whs.watl.ui.TextViewEx;
-import su.whs.watl.ui.TextViewLayoutListener;
+import su.whs.help.utils.OverlaysManager;
+import su.whs.showcase.R;
 
 /**
  * Created by igor n. boulliev on 13.07.15.
  */
 
-public class OverlayView extends FrameLayout implements TextViewLayoutListener {
+public class OverlayView extends FrameLayout {
     private static final String TAG="OverlayView";
     private boolean mPostionCalculated = false;
     private Button mNextButton;
-    private TextViewEx mHintTextView = null;
+    private TextView mHintTextView = null;
     private ScrollView mHintTextContainer = null;
     private ScreenDefinition mScreenDefinition = null;
     private ViewGroup mScopeRoot = null;
@@ -101,14 +98,13 @@ public class OverlayView extends FrameLayout implements TextViewLayoutListener {
         mBorder.setColor(mStyle.getHintFontColor()); // TODO: create attribute BorderColor
         mBorder.setStrokeWidth(style.getBorderWidth());
         pHole.setMaskFilter(new BlurMaskFilter(style.getHighlightRectEdgesBlur(), BlurMaskFilter.Blur.NORMAL));
-        mHintTextView = new TextViewEx(context,attrs);
+        mHintTextView = new TextView(context,attrs);
 
         mHintTextView.setTextColor(Color.WHITE);
         Typeface tf = mStyle.getHintTypeface(context);
         mHintTextView.setTypeface(tf);
         mHintTextContainer = new ScrollView(context,attrs);
         mHintTextView.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-        mHintTextView.setTextViewLayoutListener(this);
         mHintTextContainer.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         mHintTextContainer.addView(mHintTextView);
         addView(mHintTextContainer);
@@ -207,9 +203,7 @@ public class OverlayView extends FrameLayout implements TextViewLayoutListener {
             mHintMeasureState = false;
             mReadyToDraw = false;
         }  else if (!mReadyToDraw) {
-            hintHeight = mHintTextView
-                    .getTextLayout()
-                    .getHeight(); // mHintTextView.getTextLayout().getHeight();
+            hintHeight = mHintTextView.getHeight();
             Log.d(TAG, "measured hint height: " + hintHeight);
         }
         Rect nextButtonRect = new Rect();
@@ -250,7 +244,7 @@ public class OverlayView extends FrameLayout implements TextViewLayoutListener {
 
 
     private void move(View v, Rect r) {
-        Log.d(TAG,"move "+v+" to "+r);
+        Log.d(TAG, "move " + v + " to " + r);
         FrameLayout.LayoutParams lp = (LayoutParams) v.getLayoutParams();
         lp.setMargins(r.left, r.top, getWidth() - r.right, getHeight() - r.bottom);
         v.setLayoutParams(lp);
@@ -305,25 +299,10 @@ public class OverlayView extends FrameLayout implements TextViewLayoutListener {
 
     @Override
     public void onLayout(boolean changed, int l, int t, int r, int b) {
-        super.onLayout(changed,l,t,r,b);
+        super.onLayout(changed, l, t, r, b);
         if (changed || mHintMeasureState) {
             mPostionCalculated = false;
             invalidate();
         }
     }
-
-    @Override
-    public synchronized void onLayoutFinished(int position) {
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (OverlayView.this) {
-                    mReadyToDraw = true;
-                    mPostionCalculated = false;
-                    invalidate();
-                }
-            }
-        });
-    }
-
 }

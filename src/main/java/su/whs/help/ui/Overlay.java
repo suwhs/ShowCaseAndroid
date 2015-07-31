@@ -1,4 +1,4 @@
-package su.whs.hole.ui;
+package su.whs.help.ui;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -17,8 +17,8 @@ import android.widget.AdapterView;
 import java.util.ArrayList;
 import java.util.List;
 
-import su.whs.hole.utils.OverlaysManager;
-import su.whs.watl.samples.R;
+import su.whs.help.utils.OverlaysManager;
+import su.whs.showcase.R;
 
 /**
  * Created by igor n. boulliev on 11.07.15.

@@ -1,4 +1,4 @@
-package su.whs.hole.utils;
+package su.whs.help.utils;
 
 import android.app.Activity;
 import android.content.Context;
@@ -9,8 +9,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import su.whs.hole.ui.IOverlay;
-import su.whs.watl.samples.R;
+import su.whs.help.ui.IOverlay;
+import su.whs.showcase.R;
+
 
 /**
  * Created by igor n. boulliev on 11.07.15.

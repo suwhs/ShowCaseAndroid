@@ -1,4 +1,4 @@
-package su.whs.hole.ui;
+package su.whs.help.ui;
 
 /**
  * Created by igor n. boulliev on 15.07.15.
@@ -14,8 +14,7 @@ import android.widget.Button;
 
 import java.util.Locale;
 
-import su.whs.utils.TextUtils;
-import su.whs.watl.samples.R;
+import su.whs.showcase.R;
 
 /**
  *

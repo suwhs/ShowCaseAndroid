@@ -1,4 +1,4 @@
-package su.whs.hole.ui;
+package su.whs.help.ui;
 
 /**
  * Created by igor n. boulliev on 15.07.15.
@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import su.whs.utils.AndroidUtils;
 
 class Builder {
     private static final String TAG = "Builder";
