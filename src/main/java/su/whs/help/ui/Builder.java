@@ -45,6 +45,8 @@ class Builder {
     private void handleStartTag(XmlPullParser parser, Resources res) {
         if ("screen".equals(parser.getName())) {
             beginScreen(parser, res);
+        } else if ("baloon".equals(parser.getName())) {
+            beginBaloon(parser, res);
         }
     }
 
@@ -55,6 +57,8 @@ class Builder {
             processHint(parser, res);
         } else if ("details".equals(parser.getName())) {
             processDetails(parser, res);
+        } else if ("baloon".equals(parser.getName())) {
+            commitBaloon();
         }
     }
 
@@ -65,21 +69,33 @@ class Builder {
     }
 
     private ScreenDefinition currentScreenDefition = null;
+    private boolean preferenceMode = false;
 
     private void beginScreen(XmlPullParser parser, Resources res) {
         if (currentScreenDefition != null)
             throw new IllegalStateException("inner screen tag not allowed");
         // attributes:
         // id
-        currentScreenDefition = new ScreenDefinition();
+
         String _id = parser.getAttributeValue(null, "id");
         if (_id != null) {
+            currentScreenDefition = new ScreenDefinition();
             currentScreenDefition.viewId = AndroidUtils.resolveId(
                     context, res, _id);
             Log.v(TAG, "id attribute='" + currentScreenDefition.viewId
                     + "'");
+        } else {
+            _id = parser.getAttributeValue(null,"key");
+            if (_id!=null) {
+                ScreenDefinition.PreferenceDefinition pd = new ScreenDefinition.PreferenceDefinition();
+                pd.key = _id;
+                currentScreenDefition = pd;
+            }
         }
-        // hint
+        readHintAndDetails(parser,res);
+    }
+
+    private void readHintAndDetails(XmlPullParser parser, Resources res) {
         String _hint = parser.getAttributeValue(null, "hint");
         if (_hint != null) {
             currentScreenDefition.hint = AndroidUtils.resolveString(
@@ -95,11 +111,44 @@ class Builder {
             Log.v(TAG, "details attribute='"
                     + currentScreenDefition.details + "'");
         }
-
     }
 
     private void commitScreen() {
         mDefinitions.add(currentScreenDefition);
+        preferenceMode = false;
+        currentScreenDefition = null;
+    }
+
+    private void beginBaloon(XmlPullParser parser, Resources res) {
+        if (currentScreenDefition != null)
+            throw new IllegalStateException("inner screen tag not allowed");
+        // attributes:
+        // id
+
+        String _id = parser.getAttributeValue(null, "id");
+        if (_id==null) {
+            Log.d(TAG,"try to lookup key attribute");
+            String _key = parser.getAttributeValue(null,"key");
+            if (_key!=null) {
+                ScreenDefinition.PreferenceDefinition pd = new ScreenDefinition.PreferenceDefinition();
+                pd.key = _key;
+                currentScreenDefition = pd;
+            } else {
+                Log.e(TAG,"definition has no id or key");
+                return;
+            }
+        } else {
+            currentScreenDefition = new ScreenDefinition();
+            currentScreenDefition.viewId = AndroidUtils.resolveId(
+                    context, res, _id);
+        }
+        currentScreenDefition.mode = ScreenDefinition.Mode.BALOON;
+        readHintAndDetails(parser,res);
+    }
+
+    private void commitBaloon() {
+        mDefinitions.add(currentScreenDefition);
+        preferenceMode = false;
         currentScreenDefition = null;
     }
 

@@ -14,6 +14,9 @@ import android.view.ViewParent;
 import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,6 +58,7 @@ public class Overlay extends View implements IOverlay {
     }
 
     private void init(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        Log.v(TAG,"init()");
         mAttributes = attrs;
         if (!isInEditMode()) {
             setVisibility(View.INVISIBLE);
@@ -115,6 +119,7 @@ public class Overlay extends View implements IOverlay {
 
     private void onViewsCreated() {
         /* all views created */
+        Log.v(TAG, "onViewsCreated()");
         OverlaysManager.getInstance(getContext()).register(this);
     }
 
@@ -164,17 +169,16 @@ public class Overlay extends View implements IOverlay {
             throw new IllegalStateException();
         }
         next();
-
     }
 
     private void next() {
         if (mCurrentScreen<mScreens.size()) {
             mOverlay.setScreenDefinition((ViewGroup)getParent(),mScreens.get(mCurrentScreen));
             mCurrentScreen++;
+            updateControlsState();
         } else {
             finishOverlayView();
         }
-        updateControlsState();
     }
 
     private void updateControlsState() {
@@ -193,10 +197,10 @@ public class Overlay extends View implements IOverlay {
         List<ViewGroup> groups = new ArrayList<ViewGroup>();
         for (int i=0; i<buf.size(); i++) {
             View child = buf.get(i);
-            if (child instanceof ViewGroup) {
+            if (child instanceof AdapterView) {
+                setupContentDescriptionMode((AdapterView) child);
+            } else if (child instanceof ViewGroup) {
                 groups.add((ViewGroup) child);
-            } else if (child instanceof AdapterView) {
-                setupContentDescriptionMode((AdapterView)child);
             } else {
                 CharSequence contentDescription = child.getContentDescription();
                 if (contentDescription==null || contentDescription.length()<1)
@@ -215,13 +219,42 @@ public class Overlay extends View implements IOverlay {
     }
 
     private void setupContentDescriptionMode(AdapterView adapterView) {
-        Log.e(TAG, "adapterView support not implemented yet");
+        for (int i=0; i<adapterView.getChildCount(); i++) {
+            View child = adapterView.getChildAt(i);
+            CharSequence contentDescription = child.getContentDescription();
+            if (contentDescription!=null && contentDescription.length()>0) {
+                ScreenDefinition sd = new ScreenDefinition();
+                sd.viewId = child.getId();
+                if (sd.viewId<0)
+                    continue;
+                sd.hint = contentDescription;
+                mScreens.add(sd);
+            }
+            if (child instanceof ViewGroup) {
+                setupContentDescriptionMode((ViewGroup)child);
+            }
+        }
     }
 
     private void startXml() {
         initOverlayView(); // disable interaction until screens actualy starts
         // use Builder to build screens for parent's scope
         // start display sequence
+        try {
+            Builder b = new Builder(getContext(),mXmlResourceId);
+            mScreens = b.get();
+            for (ScreenDefinition sd:mScreens) {
+                if (sd.viewId<0) {
+
+                }
+            }
+            Log.e(TAG,"screens definition parsed");
+            next();
+        } catch (XmlPullParserException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void initOverlayView() {
@@ -240,6 +273,9 @@ public class Overlay extends View implements IOverlay {
             container.addView(mOverlay);
             mOverlay.bringToFront();
             mOverlay.requestFocus();
+        } else {
+            Log.e(TAG,"root are "+root);
+            Log.e(TAG,"stop here");
         }
     }
 
@@ -253,6 +289,7 @@ public class Overlay extends View implements IOverlay {
                 OverlaysManager.getInstance(getContext()).onFinished(this);
             }
         }
+        mCurrentScreen = 0;
     }
 
     @Override
@@ -260,4 +297,11 @@ public class Overlay extends View implements IOverlay {
         finishOverlayView();
     }
 
+    /**
+     * mode 1:
+     *    screen sequence show
+     * mode 2:
+     *    screen baloons sets
+     *
+     */
 }

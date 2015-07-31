@@ -13,6 +13,7 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Build;
+import android.preference.Preference;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -20,6 +21,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ScrollView;
@@ -153,12 +155,51 @@ public class OverlayView extends FrameLayout {
         mOverlayBitmap.eraseColor(mStyle.getBackgroundColor());
         mOverlayCanvas.drawRect(mTargetRect, pHole);
     }
+    private View lookupPreferenceItemByKey(String key) {
+        return lookupPreferenceItemByKey(key,mScopeRoot);
+    }
+
+    private View lookupPreferenceItemByKey(String key, ViewGroup container) {
+        for (int i=0; i<container.getChildCount(); i++) {
+            View child = container.getChildAt(i);
+            if (child instanceof AdapterView) {
+                // we found settings listview ?
+                View r = lookupPreferenceItemByKey(key, (AdapterView) child);
+                if (r!=null) return r;
+            }
+        }
+        return null;
+    }
+
+    private View lookupPreferenceItemByKey(String key, AdapterView adapterView) {
+        for (int i=0; i < adapterView.getChildCount(); i++) {
+            View v = adapterView.getChildAt(i);
+            int pos = adapterView.getPositionForView(v);
+            if (pos!=AdapterView.INVALID_POSITION) {
+                Object obj = adapterView.getItemAtPosition(pos);
+                if (obj instanceof Preference) {
+                    Preference pref = (Preference)obj;
+                    if (key.equals(pref.getKey())) return v;
+                }
+            }
+        }
+        return null;
+    }
 
     private void calculateViewsPositions() {
         // take a rect of view
         // move hint text first
         // move hint title next
-        View target = mScopeRoot.findViewById(mScreenDefinition.viewId);
+        View target;
+        if (mScreenDefinition.viewId < 1 && mScreenDefinition instanceof ScreenDefinition.PreferenceDefinition) {
+            target = lookupPreferenceItemByKey(((ScreenDefinition.PreferenceDefinition) mScreenDefinition).key);
+            if (target!=null)
+                mScreenDefinition.viewId = target.getId();
+            else {
+                Log.v(TAG,"no key found :(");
+            }
+        } else
+            target = mScopeRoot.findViewById(mScreenDefinition.viewId);
         int[] locationInScreen = new int[2];
         if (target!=null) {
             target.getLocationOnScreen(locationInScreen);
@@ -205,6 +246,7 @@ public class OverlayView extends FrameLayout {
         }  else if (!mReadyToDraw) {
             hintHeight = mHintTextView.getHeight();
             Log.d(TAG, "measured hint height: " + hintHeight);
+            mReadyToDraw = true;
         }
         Rect nextButtonRect = new Rect();
         nextButtonRect.bottom = mContentRect.bottom - mStyle.getHintMargins()[3];
